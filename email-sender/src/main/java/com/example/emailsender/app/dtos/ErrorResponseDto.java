@@ -10,4 +10,5 @@ import lombok.Setter;
 
 public class ErrorResponseDto {
     private final String errorMessage;
+    private final String additionalInformation;
 }

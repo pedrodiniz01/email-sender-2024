@@ -11,6 +11,9 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class EmailService {
 
@@ -19,14 +22,29 @@ public class EmailService {
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
 
-    public CreateMessageOutputDto saveMessage(CreateMessageInputDto messageInput) {
+    public List<CreateMessageOutputDto> saveMessages(List<CreateMessageInputDto> messageList) {
 
-        String message = messageInput.getMessage();
+        List<MessageJpa> messageJpaList = new ArrayList<>();
 
-        if (StringUtil.notNullNorEmpty(message) && !messageRepository.existsByMessage(message)) {
-            MessageJpa messageJpa = messageRepository.save(mapper.toJpa(messageInput));
-            return mapper.toDomain(messageJpa);
+        for (CreateMessageInputDto messageInput : messageList) {
+
+            String message = messageInput.getMessage();
+
+            MessageJpa messageJpa = mapper.toJpa(messageInput);
+            messageJpaList.add(messageJpa);
+
+            if (StringUtil.notNullNorEmpty(message) && !messageRepository.existsByMessage(message)) {
+                messageRepository.save(messageJpa);
+            } else {
+                throw new InvalidMessageException("Invalid message.", messageJpaList.stream().map(MessageJpa::getMessage).toList());
+            }
         }
-        throw new InvalidMessageException("Invalid message.");
+
+        return mapper.toDomain(messageJpaList);
+
+    }
+
+    public void deleteAllData() {
+        messageRepository.deleteAll();
     }
 }
