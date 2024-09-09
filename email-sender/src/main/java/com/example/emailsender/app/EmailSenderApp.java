@@ -1,4 +1,4 @@
-package com.example.emailsender.demo;
+package com.example.emailsender.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
