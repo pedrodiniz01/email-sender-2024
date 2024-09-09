@@ -41,7 +41,6 @@ public class EmailService {
         }
 
         return mapper.toDomain(messageJpaList);
-
     }
 
     public void deleteAllData() {
