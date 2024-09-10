@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageJpaRepository extends JpaRepository<MessageJpa, Long> {
     boolean existsByMessage(String message);
+
+
 }
