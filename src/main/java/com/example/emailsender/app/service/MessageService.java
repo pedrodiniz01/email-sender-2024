@@ -14,16 +14,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
-public class EmailService {
+public class MessageService {
 
     @Autowired
     private MessageJpaRepository messageRepository;
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
 
-    public List<CreateMessageOutputDto> saveMessages(List<CreateMessageInputDto> messageList) {
+    public List<CreateMessageOutputDto> createMessages(List<CreateMessageInputDto> messageList) {
 
         List<MessageJpa> messageJpaList = new ArrayList<>();
 
@@ -31,7 +32,7 @@ public class EmailService {
 
             String message = messageInput.getMessage();
 
-            MessageJpa messageJpa = mapper.toJpa(messageInput);
+            MessageJpa messageJpa = mapper.toMessageJpa(messageInput);
             messageJpaList.add(messageJpa);
 
             if (StringUtil.notNullNorEmpty(message) && !messageRepository.existsByMessage(message)) {
@@ -41,7 +42,7 @@ public class EmailService {
             }
         }
 
-        return mapper.toDomain(messageJpaList);
+        return mapper.toMessageOutputDtoList(messageJpaList);
     }
 
     public CreateMessageOutputDto deleteMessageById(Long id) {
@@ -49,7 +50,7 @@ public class EmailService {
 
         if (messageJpaOpt.isPresent()) {
             messageRepository.deleteById(id);
-            return mapper.toDomain(messageJpaOpt.get());
+            return mapper.toMessageOutputDto(messageJpaOpt.get());
         }
         throw new InvalidInputException(String.format("Id not found: %d", id), null);
     }
@@ -62,12 +63,31 @@ public class EmailService {
 
             messageJpa.setMessage(message);
             messageRepository.save(messageJpa);
-            return mapper.toDomain(messageJpa);
+            return mapper.toMessageOutputDto(messageJpa);
         }
         throw new InvalidInputException(String.format("Error updating message with id: %d", id), null);
     }
 
     public void deleteAllData() {
         messageRepository.deleteAll();
+    }
+
+    public List<CreateMessageOutputDto> retrieveAllMessages() {
+        return mapper.toMessageOutputDtoList(messageRepository.findAll());
+    }
+
+    public CreateMessageOutputDto getRandomMessage() {
+
+        List<Long> ids = messageRepository.findAll().stream().map(MessageJpa::getId).toList();
+
+        if(!ids.isEmpty()) {
+            Random random = new Random();
+            int randomId = random.nextInt(ids.size());
+
+            Integer id = Math.toIntExact(ids.get(randomId));
+
+            return mapper.toMessageOutputDto(messageRepository.findById((long) id).get());
+        }
+        throw new RuntimeException("Error getting random message.");
     }
 }

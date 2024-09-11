@@ -7,9 +7,9 @@ import java.util.List;
 @Getter
 public class InvalidInputException extends RuntimeException {
 
-    private List<String> additionalInformation;
+    private List<?> additionalInformation;
 
-    public InvalidInputException(String errorMessage, List<String> additionalInformation) {
+    public InvalidInputException(String errorMessage, List<?> additionalInformation) {
         super(errorMessage);
         this.additionalInformation = additionalInformation;
 
