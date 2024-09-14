@@ -1,14 +1,13 @@
-# Use a base image with JDK
-FROM openjdk:17-jdk-slim
+# Use the official Postgres image as the base
+FROM postgres:13
 
-# Set the working directory
-WORKDIR /app
+# Set environment variables (optional, usually these are set at runtime)
+ENV POSTGRES_DB=emailsender
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=admin
 
-# Copy the JAR file into the container
-COPY target/your-spring-boot-app.jar app.jar
+# Copy custom configuration files or initialization scripts here (if needed)
+# COPY init.sql /docker-entrypoint-initdb.d/
 
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Expose the port Postgres runs on
+EXPOSE 5432

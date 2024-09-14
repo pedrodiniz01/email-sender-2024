@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: email-sender-v2-db
+    environment:
+      POSTGRES_DB: emailsender
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - springboot-network
+
+  app:
+    image: openjdk:17-jdk-alpine
+    container_name: email-sender-v2
+    command: ["java", "-jar", "/app.jar"]
+    volumes:
+      - ./target/emailsender-0.0.1-SNAPSHOT.jar:/app.jar
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/emailsender
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      JAR_FILE: emailsender-0.0.1-SNAPSHOT.jar
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - springboot-network
+
+volumes:
+  pgdata:
+
+networks:
+  springboot-network:
+    driver: bridge
