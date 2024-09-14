@@ -3,7 +3,7 @@ package com.example.emailsender.app.controller;
 import com.example.emailsender.app.dtos.CreateMessageInputDto;
 import com.example.emailsender.app.dtos.ErrorResponseDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
-import com.example.emailsender.app.job.Job;
+import com.example.emailsender.app.job.JobService;
 import com.example.emailsender.app.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class MessageController {
     private MessageService messageService;
 
     @Autowired
-    private Job job;
+    private JobService jobService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createMessage(@RequestBody List<CreateMessageInputDto> message) {
@@ -65,6 +65,6 @@ public class MessageController {
 
     @GetMapping("/test")
     public void runJob() {
-        job.sendEmailJob();
+        jobService.trigger();
     }
 }
