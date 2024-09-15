@@ -1,24 +1,14 @@
 package com.example.emailsender.app.service;
 
-import ch.qos.logback.core.util.StringUtil;
-import com.example.emailsender.app.dtos.CreateMessageInputDto;
-import com.example.emailsender.app.dtos.CreateMessageOutputDto;
-import com.example.emailsender.app.dtos.ErrorResponseDto;
 import com.example.emailsender.app.dtos.ScheduleDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
 import com.example.emailsender.app.mapper.Mapper;
 import com.example.emailsender.app.repository.ScheduleJpaRepository;
-import com.example.emailsender.app.repository.tables.MessageJpa;
 import com.example.emailsender.app.repository.tables.ScheduleJpa;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -26,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ScheduleService {
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
@@ -48,6 +39,7 @@ public class ScheduleService {
             if (validateHour(hour)) {
                 scheduleJpaList.add(scheduleJpa);
                 scheduleJpaRepository.save(scheduleJpa);
+                log.info(String.format("Saving schedule hour: "), hour);
             } else {
                 throw new InvalidInputException("Invalid message.", scheduleJpaList.stream().map(ScheduleJpa::getHour).toList());
             }

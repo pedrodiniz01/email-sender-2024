@@ -3,6 +3,7 @@ package com.example.emailsender.app.service;
 import com.example.emailsender.app.dtos.CreateMessageOutputDto;
 import com.example.emailsender.app.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,6 +16,7 @@ import static com.example.emailsender.app.constants.EmailConstants.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailSenderService {
 
     @Autowired
@@ -30,6 +32,8 @@ public class EmailSenderService {
         mailMessage.setTo(TO_EMAIL);
         mailMessage.setSubject(subject);
         mailMessage.setText(body);
+
+        log.info(String.format("Following message will be sent:"), body);
 
         return mailMessage;
     }

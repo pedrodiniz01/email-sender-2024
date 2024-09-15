@@ -17,7 +17,7 @@ public class JobController {
     JobService jobService;
 
     @PostMapping("/trigger")
-    public ResponseEntity<?> sendBackupEmail() {
+    public ResponseEntity<?> triggerJob() {
         jobService.trigger();
         return new ResponseEntity<>("Job triggered.", HttpStatus.OK);
     }

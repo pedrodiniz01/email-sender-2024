@@ -7,6 +7,7 @@ import com.example.emailsender.app.exceptions.InvalidInputException;
 import com.example.emailsender.app.mapper.Mapper;
 import com.example.emailsender.app.repository.MessageJpaRepository;
 import com.example.emailsender.app.repository.tables.MessageJpa;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@Slf4j
 public class MessageService {
 
     @Autowired
@@ -37,7 +39,9 @@ public class MessageService {
 
             if (StringUtil.notNullNorEmpty(message) && !messageRepository.existsByMessage(message)) {
                 messageRepository.save(messageJpa);
+                log.info(String.format("Message succesfully saved: ", message));
             } else {
+                log.info(String.format("Error saving message: ", message));
                 throw new InvalidInputException("Invalid message.", messageJpaList.stream().map(MessageJpa::getMessage).toList());
             }
         }
@@ -50,6 +54,7 @@ public class MessageService {
 
         if (messageJpaOpt.isPresent()) {
             messageRepository.deleteById(id);
+            log.info(String.format("Message succesfully deleted: ", messageJpaOpt.get().getMessage()));
             return mapper.toMessageOutputDto(messageJpaOpt.get());
         }
         throw new InvalidInputException(String.format("Id not found: %d", id), null);
@@ -63,6 +68,7 @@ public class MessageService {
 
             messageJpa.setMessage(message);
             messageRepository.save(messageJpa);
+            log.info(String.format("Message succesfully updated: ", message));
             return mapper.toMessageOutputDto(messageJpa);
         }
         throw new InvalidInputException(String.format("Error updating message with id: %d", id), null);
@@ -73,8 +79,9 @@ public class MessageService {
     }
 
     public List<CreateMessageOutputDto> retrieveAllMessages() {
+        log.info("Retrieving all messages.");
         return mapper.toMessageOutputDtoList(messageRepository.findAll());
-    }
+       }
 
     public CreateMessageOutputDto getRandomMessage() {
 

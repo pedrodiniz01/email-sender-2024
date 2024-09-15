@@ -1,6 +1,5 @@
 package com.example.emailsender.app.controller;
 
-import com.example.emailsender.app.dtos.CreateMessageInputDto;
 import com.example.emailsender.app.dtos.ErrorResponseDto;
 import com.example.emailsender.app.dtos.ScheduleDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
