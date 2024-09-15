@@ -19,7 +19,7 @@ public class JobService {
     @Autowired
     EmailSenderService emailSenderService;
 
-    @Scheduled(cron = "0 8-23 * * * ?")
+    @Scheduled(cron = "0 0 8-12 * * ?")
     public void trigger() {
 
         if (scheduleService.isCurrentHourInList()) {
@@ -29,7 +29,7 @@ public class JobService {
         log.info("Current hour is not scheduled to send message. No messages will be sent.");
     }
 
-    @Scheduled(cron = "0 0 5 * * TUE")
+    @Scheduled(cron = "0 0 5 ? * TUE")
     public void sendBackupEmail() {
         emailSenderService.sendBackupEmail();
         log.info("Sending backup email - every tuesdays at 5am.");

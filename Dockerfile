@@ -1,13 +1,14 @@
-# Use the official Postgres image as the base
-FROM postgres:13
+# Use a base image with JDK 17 for ARM architecture
+FROM arm32v7/eclipse-temurin:17-jdk-focal
 
-# Set environment variables (optional, usually these are set at runtime)
-ENV POSTGRES_DB=emailsender
-ENV POSTGRES_USER=admin
-ENV POSTGRES_PASSWORD=admin
+# Set the working directory
+WORKDIR /app
 
-# Copy custom configuration files or initialization scripts here (if needed)
-# COPY init.sql /docker-entrypoint-initdb.d/
+# Copy the JAR file into the container
+COPY target/emailsender-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port Postgres runs on
-EXPOSE 5432
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
