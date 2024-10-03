@@ -1,5 +1,6 @@
 package com.example.emailsender.app.controller;
 
+import com.example.emailsender.app.dtos.AdditionalMessageInputDto;
 import com.example.emailsender.app.dtos.CreateMessageInputDto;
 import com.example.emailsender.app.dtos.ErrorResponseDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
@@ -33,11 +34,28 @@ public class MessageController {
                     exception.getAdditionalInformation().toString()), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping("/additional/{id}/create")
+    public ResponseEntity<?> createAdditionalMessage(@PathVariable Long id, @RequestBody AdditionalMessageInputDto message) {
+        try {
+            return new ResponseEntity<>(messageService.createAdditionalMessage(id, message), HttpStatus.CREATED);
+        } catch (InvalidInputException exception) {
+            return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(),
+                    exception.getAdditionalInformation().toString()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(messageService.deleteMessageById(id), HttpStatus.OK);
+        } catch (InvalidInputException exception) {
+            return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+ @DeleteMapping("/additional/{id}")
+    public ResponseEntity<?> deleteAdditionalMessageById(@PathVariable Long id) {
+        try {
+            return new ResponseEntity<>(messageService.deleteAdditionalMessageById(id), HttpStatus.OK);
         } catch (InvalidInputException exception) {
             return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -49,10 +67,17 @@ public class MessageController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateMessageById(@PathVariable Long id, @RequestBody CreateMessageInputDto updateMessageDto) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateMainMessageById(@PathVariable Long id, @RequestBody CreateMessageInputDto updateMessageDto) {
         try {
-            return new ResponseEntity<>(messageService.updateMessageById(id, updateMessageDto.getMessage()), HttpStatus.OK);
+            return new ResponseEntity<>(messageService.updateMainMessageById(id, updateMessageDto.getMessage()), HttpStatus.OK);
+        } catch (InvalidInputException exception) {
+            return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }@PatchMapping("/additional/{id}")
+    public ResponseEntity<?> updateAdditionalMessageById(@PathVariable Long id, @RequestBody AdditionalMessageInputDto additionalMessageInputDto) {
+        try {
+            return new ResponseEntity<>(messageService.updateAdditionalMessageById(id, additionalMessageInputDto.getMessage()), HttpStatus.OK);
         } catch (InvalidInputException exception) {
             return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

@@ -1,11 +1,14 @@
 package com.example.emailsender.app.service;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.emailsender.app.dtos.AdditionalMessageInputDto;
 import com.example.emailsender.app.dtos.CreateMessageInputDto;
 import com.example.emailsender.app.dtos.CreateMessageOutputDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
 import com.example.emailsender.app.mapper.Mapper;
+import com.example.emailsender.app.repository.AdditionalMessageJpaRepository;
 import com.example.emailsender.app.repository.MessageJpaRepository;
+import com.example.emailsender.app.repository.tables.AdditionalMessageJPA;
 import com.example.emailsender.app.repository.tables.MessageJpa;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -23,6 +26,8 @@ public class MessageService {
 
     @Autowired
     private MessageJpaRepository messageRepository;
+    @Autowired
+    private AdditionalMessageJpaRepository additionalMessageJpaRepository;
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
 
@@ -48,6 +53,26 @@ public class MessageService {
 
         return mapper.toMessageOutputDtoList(messageJpaList);
     }
+    public CreateMessageOutputDto createAdditionalMessage(Long id, AdditionalMessageInputDto message) {
+
+        Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
+
+        if (messageJpaOpt.isPresent()) {
+            List<AdditionalMessageJPA> additionalMessageJPAList = messageJpaOpt.get().getAdditionalMessages();
+
+            AdditionalMessageJPA additionalMessageJPA = new AdditionalMessageJPA();
+            additionalMessageJPA.setAdditionalMessage(message.getMessage());
+            additionalMessageJPA.setMessageJpa(messageJpaOpt.get());
+
+            additionalMessageJPAList.add(additionalMessageJPA);
+
+            messageRepository.save(messageJpaOpt.get());
+
+            log.info(String.format("Message succesfully uppdated: ", messageJpaOpt.get().getMessage()));
+            return mapper.toMessageOutputDto(messageRepository.findById(additionalMessageJPA.getMessageId()).get());
+        }
+        throw new InvalidInputException(String.format("Id not found: %d", id), null);
+    }
 
     public CreateMessageOutputDto deleteMessageById(Long id) {
         Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
@@ -60,7 +85,7 @@ public class MessageService {
         throw new InvalidInputException(String.format("Id not found: %d", id), null);
     }
 
-    public CreateMessageOutputDto updateMessageById(Long id, String message) {
+    public CreateMessageOutputDto updateMainMessageById(Long id, String message) {
         Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
 
         if (StringUtil.notNullNorEmpty(message) && messageRepository.existsById(id)) {
@@ -71,7 +96,34 @@ public class MessageService {
             log.info(String.format("Message succesfully updated: ", message));
             return mapper.toMessageOutputDto(messageJpa);
         }
-        throw new InvalidInputException(String.format("Error updating message with id: %d", id), null);
+        throw new InvalidInputException(String.format("Error updating main message with id: %d", id), null);
+    }
+
+    public CreateMessageOutputDto updateAdditionalMessageById(Long id, String message) {
+        Optional<AdditionalMessageJPA> optAdditionalMessageJPA = additionalMessageJpaRepository.findById(id);
+
+        if (StringUtil.notNullNorEmpty(message) && additionalMessageJpaRepository.existsById(id)) {
+            AdditionalMessageJPA additionalMessageJPA = optAdditionalMessageJPA.get();
+
+            additionalMessageJPA.setAdditionalMessage(message);
+            additionalMessageJpaRepository.save(additionalMessageJPA);
+            log.info(String.format("Message succesfully updated: ", message));
+            return mapper.toMessageOutputDto(messageRepository.findById(additionalMessageJPA.getMessageId()).get());
+        }
+        throw new InvalidInputException(String.format("Error updating additional message with id: %d", id), null);
+    }
+
+    public CreateMessageOutputDto deleteAdditionalMessageById(Long id) {
+        Optional<AdditionalMessageJPA> optAdditionalMessageJPA = additionalMessageJpaRepository.findById(id);
+
+        if (optAdditionalMessageJPA.isPresent()) {
+            AdditionalMessageJPA additionalMessageJPA = optAdditionalMessageJPA.get();
+            additionalMessageJpaRepository.deleteById(id);
+            log.info(String.format("Message succesfully deleted: ", optAdditionalMessageJPA.get().getAdditionalMessage()));
+            return mapper.toMessageOutputDto(messageRepository.findById(additionalMessageJPA.getMessageId()).get());
+        }
+
+        throw new InvalidInputException(String.format("Error updating additional message with id: %d", id), null);
     }
 
     public void deleteAllData() {

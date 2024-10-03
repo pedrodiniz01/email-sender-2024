@@ -19,7 +19,7 @@ public class JobService {
     @Autowired
     EmailSenderService emailSenderService;
 
-    @Scheduled(cron = "0 0 8-12 * * ?")
+    @Scheduled(cron = "0 0 8-23 * * ?")
     public void trigger() {
 
         if (scheduleService.isCurrentHourInList()) {

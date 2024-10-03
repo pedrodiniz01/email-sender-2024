@@ -18,4 +18,5 @@ public interface Mapper {
     CreateMessageOutputDto toMessageOutputDto(MessageJpa messageJpa);
     List<ScheduleDto> toScheduleDtoList(List<ScheduleJpa> jpaList);
     ScheduleDto toScheduleDto(ScheduleJpa jpa);
+    List<CreateMessageInputDto> toCreateMessageInputDtoList (List<CreateMessageOutputDto> createMessageOutputDtos);
 }
