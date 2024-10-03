@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -19,6 +20,7 @@ public class JobService {
     @Autowired
     EmailSenderService emailSenderService;
 
+    @Transactional
     @Scheduled(cron = "0 0 8-23 * * ?")
     public void trigger() {
 
@@ -26,9 +28,11 @@ public class JobService {
             emailSenderService.sendRandomMessageEmail();
             log.info("Sending random message.");
         }
-        log.info("Current hour is not scheduled to send message. No messages will be sent.");
+        else {
+            log.info("Current hour is not scheduled to send message. No messages will be sent.");
+        }
     }
-
+    @Transactional
     @Scheduled(cron = "0 0 5 ? * TUE")
     public void sendBackupEmail() {
         emailSenderService.sendBackupEmail();

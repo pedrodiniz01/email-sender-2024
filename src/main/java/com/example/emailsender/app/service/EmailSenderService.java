@@ -1,5 +1,6 @@
 package com.example.emailsender.app.service;
 
+import com.example.emailsender.app.dtos.CreateAdditionalMessageOutputDto;
 import com.example.emailsender.app.dtos.CreateMessageOutputDto;
 import com.example.emailsender.app.mapper.Mapper;
 import com.example.emailsender.app.utils.JsonUtils;
@@ -65,20 +66,20 @@ public class EmailSenderService {
         return createMailMessage(subject, body);
     }
 
-    private String buildRandomEmailBody(CreateMessageOutputDto messageOutputDto) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    private String buildRandomEmailBody(CreateMessageOutputDto messageDto) {
+        StringBuilder emailContent = new StringBuilder();
 
-        objectMapper.registerModule(new JavaTimeModule());
+        // Main message
+        emailContent.append(messageDto.getMessage()).append("\n\n");
 
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-
-        try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(messageOutputDto);
-        } catch (JsonProcessingException e) {
-            log.error("Error converting message to formatted JSON", e);
-            throw new RuntimeException("Error converting message to formatted JSON", e);
+        // Additional messages
+        if (messageDto.getAdditionalMessages() != null && !messageDto.getAdditionalMessages().isEmpty()) {
+            for (CreateAdditionalMessageOutputDto additionalMessage : messageDto.getAdditionalMessages()) {
+                emailContent.append("- ").append(additionalMessage.getAdditionalMessage()).append("\n");
+            }
         }
+
+        return emailContent.toString();
     }
 
 

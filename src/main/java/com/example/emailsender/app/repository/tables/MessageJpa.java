@@ -22,7 +22,7 @@ public class MessageJpa {
     @Column(nullable = false)
     private String message;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "message_id")
     private List<AdditionalMessageJPA> additionalMessages;
 
