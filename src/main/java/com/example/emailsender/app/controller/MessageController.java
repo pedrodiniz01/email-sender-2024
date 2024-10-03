@@ -70,7 +70,7 @@ public class MessageController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateMainMessageById(@PathVariable Long id, @RequestBody CreateMessageInputDto updateMessageDto) {
         try {
-            return new ResponseEntity<>(messageService.updateMainMessageById(id, updateMessageDto.getMessage()), HttpStatus.OK);
+            return new ResponseEntity<>(messageService.updateMainMessageById(id, updateMessageDto.getMainMessage()), HttpStatus.OK);
         } catch (InvalidInputException exception) {
             return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

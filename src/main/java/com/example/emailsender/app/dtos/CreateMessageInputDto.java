@@ -11,12 +11,12 @@ import java.util.List;
 @Setter
 public class CreateMessageInputDto {
 
-    String message;
+    String mainMessage;
 
     List<CreateAdditionalMessageInputDto> additionalMessages;
 
-    public CreateMessageInputDto(String message, List<CreateAdditionalMessageInputDto> createAdditionalMessages) {
-        this.message = message;
+    public CreateMessageInputDto(String mainMessage, List<CreateAdditionalMessageInputDto> createAdditionalMessages) {
+        this.mainMessage = mainMessage;
         this.additionalMessages = createAdditionalMessages;
     }
 }

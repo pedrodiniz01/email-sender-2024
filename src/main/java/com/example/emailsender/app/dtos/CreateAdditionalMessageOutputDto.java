@@ -12,12 +12,10 @@ import java.time.LocalDate;
 public class CreateAdditionalMessageOutputDto {
 
     Long id;
-    LocalDate date;
     String additionalMessage;
 
     public CreateAdditionalMessageOutputDto(Long id, String additionalMessage, LocalDate date) {
         this.id = id;
         this.additionalMessage = additionalMessage;
-        this.date = date;
     }
 }

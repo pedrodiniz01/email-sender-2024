@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreateMessageOutputDto {
     private final Long id;
-    private final LocalDate date;
+
     private final String message;
     private final List<CreateAdditionalMessageOutputDto> additionalMessages;
 }

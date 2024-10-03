@@ -37,9 +37,15 @@ public class MessageService {
 
         for (CreateMessageInputDto messageInput : messageList) {
 
-            String message = messageInput.getMessage();
+            String message = messageInput.getMainMessage();
 
             MessageJpa messageJpa = mapper.toMessageJpa(messageInput);
+            messageJpa.setMessage(message);
+
+            if (!messageJpa.getAdditionalMessages().isEmpty()) {
+                messageJpa.getAdditionalMessages().get(0).setMessageJpa(messageJpa);
+            }
+
             messageJpaList.add(messageJpa);
 
             if (StringUtil.notNullNorEmpty(message) && !messageRepository.existsByMessage(message)) {
