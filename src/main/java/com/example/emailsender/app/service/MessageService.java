@@ -15,10 +15,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -30,6 +27,8 @@ public class MessageService {
     private AdditionalMessageJpaRepository additionalMessageJpaRepository;
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
+
+    private Map messageCounter = new HashMap<Long, Integer>();
 
     public List<CreateMessageOutputDto> createMessages(List<CreateMessageInputDto> messageList) {
 
@@ -43,7 +42,9 @@ public class MessageService {
             messageJpa.setMessage(message);
 
             if (!messageJpa.getAdditionalMessages().isEmpty()) {
-                messageJpa.getAdditionalMessages().get(0).setMessageJpa(messageJpa);
+                for (AdditionalMessageJPA additionalMessage : messageJpa.getAdditionalMessages()) {
+                    additionalMessage.setMessageJpa(messageJpa);
+                }
             }
 
             messageJpaList.add(messageJpa);
@@ -59,6 +60,7 @@ public class MessageService {
 
         return mapper.toMessageOutputDtoList(messageJpaList);
     }
+
     public CreateMessageOutputDto createAdditionalMessage(Long id, AdditionalMessageInputDto message) {
 
         Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
@@ -139,20 +141,40 @@ public class MessageService {
     public List<CreateMessageOutputDto> retrieveAllMessages() {
         log.info("Retrieving all messages.");
         return mapper.toMessageOutputDtoList(messageRepository.findAll());
-       }
+    }
 
     public CreateMessageOutputDto getRandomMessage() {
 
         List<Long> ids = messageRepository.findAll().stream().map(MessageJpa::getId).toList();
 
-        if(!ids.isEmpty()) {
+        if (messageCounter == null ) {
+            ids.forEach(id -> messageCounter.put(id, null));
+        }
+
+        if (!ids.isEmpty()) {
             Random random = new Random();
             int randomId = random.nextInt(ids.size());
 
             Integer id = Math.toIntExact(ids.get(randomId));
 
+            Long count = (Long) messageCounter.get((long)id);
+            if (count == null) {
+                count = 1L;
+            }
+            else
+            {
+                count += 1;
+            }
+
+            messageCounter.put((long)id, count);
+
             return mapper.toMessageOutputDto(messageRepository.findById((long) id).get());
         }
         throw new RuntimeException("Error getting random message.");
     }
+
+    public Map getMessageCounter() {
+        return messageCounter;
+    }
+
 }

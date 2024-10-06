@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,7 +27,11 @@ public class ScheduleService {
     private ScheduleJpaRepository scheduleJpaRepository;
 
     public List<ScheduleDto> retrieveAllSchedules() {
-        return mapper.toScheduleDtoList(scheduleJpaRepository.findAll());
+        List<ScheduleDto> scheduleDtoList = mapper.toScheduleDtoList(scheduleJpaRepository.findAll());
+
+        return scheduleDtoList.stream()
+                .sorted(Comparator.comparing(ScheduleDto::getHour))
+                .collect(Collectors.toList());
     }
     public List<ScheduleDto> createSchedule(List<ScheduleDto> scheduleDtoList) {
         List<ScheduleJpa> scheduleJpaList = new ArrayList<>();

@@ -92,4 +92,9 @@ public class MessageController {
     public void runJob() {
         jobService.trigger();
     }
+
+    @GetMapping("/counter")
+    public ResponseEntity<?> getMessageCounter() {
+        return new ResponseEntity<>(messageService.getMessageCounter(), HttpStatus.OK);
+    }
 }
