@@ -10,12 +10,15 @@ import com.example.emailsender.app.repository.AdditionalMessageJpaRepository;
 import com.example.emailsender.app.repository.MessageJpaRepository;
 import com.example.emailsender.app.repository.tables.AdditionalMessageJPA;
 import com.example.emailsender.app.repository.tables.MessageJpa;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static org.antlr.v4.runtime.tree.xpath.XPath.findAll;
 
 @Service
 @Slf4j
@@ -28,7 +31,12 @@ public class MessageService {
 
     private Mapper mapper = Mappers.getMapper(Mapper.class);
 
-    private Map messageCounter = new HashMap<Long, Integer>();
+    private Map<String, Integer> messageCounter;
+
+    @PostConstruct
+    public void init() {
+        messageCounter = setMessagesCounter();
+    }
 
     public List<CreateMessageOutputDto> createMessages(List<CreateMessageInputDto> messageList) {
 
@@ -147,26 +155,26 @@ public class MessageService {
 
         List<Long> ids = messageRepository.findAll().stream().map(MessageJpa::getId).toList();
 
-        if (messageCounter == null ) {
-            ids.forEach(id -> messageCounter.put(id, null));
-        }
-
         if (!ids.isEmpty()) {
             Random random = new Random();
             int randomId = random.nextInt(ids.size());
 
             Integer id = Math.toIntExact(ids.get(randomId));
 
-            Long count = (Long) messageCounter.get((long)id);
-            if (count == null) {
-                count = 1L;
+
+            MessageJpa messageToSend = messageRepository.findById((long) id).get();
+
+            Integer countToUpdate = (Integer) messageCounter.get(messageToSend.getMessage());
+
+            if (countToUpdate == null) {
+                countToUpdate = 1;
             }
             else
             {
-                count += 1;
+                countToUpdate += 1;
             }
 
-            messageCounter.put((long)id, count);
+            messageCounter.put((messageToSend.getMessage()), countToUpdate);
 
             return mapper.toMessageOutputDto(messageRepository.findById((long) id).get());
         }
@@ -175,6 +183,16 @@ public class MessageService {
 
     public Map getMessageCounter() {
         return messageCounter;
+    }
+
+    private Map setMessagesCounter() {
+       List<String> allMessages = messageRepository.findAll().stream().map(MessageJpa::getMessage).toList();
+
+       Map messageCounterList = new HashMap<String, Integer>();
+
+        allMessages.forEach(messages -> messageCounterList.put(messages, 0));
+
+        return messageCounterList;
     }
 
 }
