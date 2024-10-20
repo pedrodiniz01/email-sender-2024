@@ -3,6 +3,7 @@ package com.example.emailsender.app.constants;
 public class EmailConstants {
     public static final String EMAIL_SUBJECT = "For Pedro Eyes only - Stay Away.";
     public static final String BACK_UP_EMAIL_SUBJECT = "For Pedro Eyes only - BACK UP EMAIL";
+    public static final String CHARACTER_ATTRIBUTES_SUBJECT = "For Pedro Eyes only - Character Attributes";
     public static final String TO_EMAIL = "inf0kkkgito1244321@outlook.com";
     public static final String FROM_EMAIL = "gitomotv24451@outlook.com";
     public static final String BODY_PREFIX = "### ".repeat(40);

@@ -15,4 +15,6 @@ public class CreateMessageOutputDto {
 
     private final String message;
     private final List<CreateAdditionalMessageOutputDto> additionalMessages;
+
+    private final Boolean isActive;
 }

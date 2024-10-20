@@ -1,8 +1,5 @@
-package com.example.emailsender.app.job;
+package com.example.emailsender.app.service;
 
-import com.example.emailsender.app.service.EmailSenderService;
-import com.example.emailsender.app.service.MessageService;
-import com.example.emailsender.app.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,6 +33,13 @@ public class JobService {
     @Scheduled(cron = "0 0 5 ? * TUE")
     public void sendBackupEmail() {
         emailSenderService.sendBackupEmail();
+        log.info("Sending backup email - every tuesdays at 5am.");
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 5 ? * TUE")
+    public void sendAttributesEmail() {
+        emailSenderService.sendAttributesEmail();
         log.info("Sending backup email - every tuesdays at 5am.");
     }
 }

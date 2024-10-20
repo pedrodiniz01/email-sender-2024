@@ -1,6 +1,6 @@
 package com.example.emailsender.app.controller;
 
-import com.example.emailsender.app.job.JobService;
+import com.example.emailsender.app.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,14 @@ public class JobController {
     JobService jobService;
 
     @PostMapping("/trigger")
-    public ResponseEntity<?> triggerJob() {
+    public ResponseEntity<?> triggerRandomEmail() {
         jobService.trigger();
+        return new ResponseEntity<>("Job triggered.", HttpStatus.OK);
+    }
+
+    @PostMapping("/attributes")
+    public ResponseEntity<?> triggerAttributes() {
+        jobService.sendAttributesEmail();
         return new ResponseEntity<>("Job triggered.", HttpStatus.OK);
     }
 }

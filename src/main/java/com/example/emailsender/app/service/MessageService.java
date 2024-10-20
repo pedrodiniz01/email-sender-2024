@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static org.antlr.v4.runtime.tree.xpath.XPath.findAll;
-
 @Service
 @Slf4j
 public class MessageService {
@@ -40,7 +38,7 @@ public class MessageService {
 
     public List<CreateMessageOutputDto> createMessages(List<CreateMessageInputDto> messageList) {
 
-        List<MessageJpa> messageJpaList = new ArrayList<>();
+        List<MessageJpa> messageJpaList = new ArrayList<>(messageList.size());
 
         for (CreateMessageInputDto messageInput : messageList) {
 
@@ -48,6 +46,7 @@ public class MessageService {
 
             MessageJpa messageJpa = mapper.toMessageJpa(messageInput);
             messageJpa.setMessage(message);
+            messageJpa.setIsActive(true);
 
             if (!messageJpa.getAdditionalMessages().isEmpty()) {
                 for (AdditionalMessageJPA additionalMessage : messageJpa.getAdditionalMessages()) {
@@ -77,9 +76,9 @@ public class MessageService {
             List<AdditionalMessageJPA> additionalMessageJPAList = messageJpaOpt.get().getAdditionalMessages();
 
             AdditionalMessageJPA additionalMessageJPA = new AdditionalMessageJPA();
+
             additionalMessageJPA.setAdditionalMessage(message.getMessage());
             additionalMessageJPA.setMessageJpa(messageJpaOpt.get());
-
             additionalMessageJPAList.add(additionalMessageJPA);
 
             messageRepository.save(messageJpaOpt.get());
@@ -94,6 +93,7 @@ public class MessageService {
         Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
 
         if (messageJpaOpt.isPresent()) {
+
             messageRepository.deleteById(id);
             log.info(String.format("Message succesfully deleted: ", messageJpaOpt.get().getMessage()));
             return mapper.toMessageOutputDto(messageJpaOpt.get());
@@ -105,6 +105,7 @@ public class MessageService {
         Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
 
         if (StringUtil.notNullNorEmpty(message) && messageRepository.existsById(id)) {
+
             MessageJpa messageJpa = messageJpaOpt.get();
 
             messageJpa.setMessage(message);
@@ -153,7 +154,7 @@ public class MessageService {
 
     public CreateMessageOutputDto getRandomMessage() {
 
-        List<Long> ids = messageRepository.findAll().stream().map(MessageJpa::getId).toList();
+        List<Long> ids = messageRepository.findByIsActive(true).stream().map(MessageJpa::getId).toList();
 
         if (!ids.isEmpty()) {
             Random random = new Random();
@@ -161,16 +162,13 @@ public class MessageService {
 
             Integer id = Math.toIntExact(ids.get(randomId));
 
-
             MessageJpa messageToSend = messageRepository.findById((long) id).get();
 
-            Integer countToUpdate = (Integer) messageCounter.get(messageToSend.getMessage());
+            Integer countToUpdate = messageCounter.get(messageToSend.getMessage());
 
             if (countToUpdate == null) {
                 countToUpdate = 1;
-            }
-            else
-            {
+            } else {
                 countToUpdate += 1;
             }
 
@@ -186,13 +184,28 @@ public class MessageService {
     }
 
     private Map setMessagesCounter() {
-       List<String> allMessages = messageRepository.findAll().stream().map(MessageJpa::getMessage).toList();
+        List<String> allMessages = messageRepository.findAll().stream().map(MessageJpa::getMessage).toList();
 
-       Map messageCounterList = new HashMap<String, Integer>();
+        Map messageCounterList = new HashMap<String, Integer>();
 
         allMessages.forEach(messages -> messageCounterList.put(messages, 0));
 
         return messageCounterList;
     }
 
+    public CreateMessageOutputDto toggleMessageActivation(Long id) {
+        Optional<MessageJpa> messageJpaOpt = messageRepository.findById(id);
+
+        if (messageJpaOpt.isPresent()) {
+            MessageJpa messageJpa = messageJpaOpt.get();
+
+            boolean invertBoolean = messageJpa.getIsActive() != null && !messageJpa.getIsActive();
+            messageJpa.setIsActive(invertBoolean);
+
+            messageRepository.save(messageJpa);
+            return mapper.toMessageOutputDto(messageJpa);
+        } else {
+            throw new InvalidInputException(String.format("Message with id %d not found.", id), null);
+        }
+    }
 }

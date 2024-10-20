@@ -2,9 +2,10 @@ package com.example.emailsender.app.controller;
 
 import com.example.emailsender.app.dtos.AdditionalMessageInputDto;
 import com.example.emailsender.app.dtos.CreateMessageInputDto;
+import com.example.emailsender.app.dtos.CreateMessageOutputDto;
 import com.example.emailsender.app.dtos.ErrorResponseDto;
 import com.example.emailsender.app.exceptions.InvalidInputException;
-import com.example.emailsender.app.job.JobService;
+import com.example.emailsender.app.service.JobService;
 import com.example.emailsender.app.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,13 +89,18 @@ public class MessageController {
         return new ResponseEntity<>(messageService.retrieveAllMessages(), HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public void runJob() {
-        jobService.trigger();
-    }
-
     @GetMapping("/counter")
     public ResponseEntity<?> getMessageCounter() {
         return new ResponseEntity<>(messageService.getMessageCounter(), HttpStatus.OK);
     }
+    @PutMapping("/activation/{id}")
+    public ResponseEntity<?> toggleMessageActivation(@PathVariable Long id) {
+        try {
+            CreateMessageOutputDto updatedMessage = messageService.toggleMessageActivation(id);
+            return new ResponseEntity<>(updatedMessage, HttpStatus.OK);
+        } catch (InvalidInputException exception) {
+            return new ResponseEntity<>(new ErrorResponseDto(exception.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

@@ -1,10 +1,8 @@
 package com.example.emailsender.app.mapper;
 
-import com.example.emailsender.app.dtos.CreateAdditionalMessageOutputDto;
-import com.example.emailsender.app.dtos.CreateMessageInputDto;
-import com.example.emailsender.app.dtos.CreateMessageOutputDto;
-import com.example.emailsender.app.dtos.ScheduleDto;
+import com.example.emailsender.app.dtos.*;
 import com.example.emailsender.app.repository.tables.AdditionalMessageJPA;
+import com.example.emailsender.app.repository.tables.CharacterJPA;
 import com.example.emailsender.app.repository.tables.MessageJpa;
 import com.example.emailsender.app.repository.tables.ScheduleJpa;
 import org.mapstruct.Mapping;
@@ -25,6 +23,7 @@ public interface Mapper {
     ScheduleDto toScheduleDto(ScheduleJpa jpa);
     List<CreateMessageInputDto> toCreateMessageInputDtoList (List<CreateMessageOutputDto> createMessageOutputDtos);
     CreateAdditionalMessageOutputDto additionalMessageJPAToCreateAdditionalMessageOutputDto(AdditionalMessageJPA additionalMessageJPA);
+    CharacterJPA toCharacterJPA(CreateCharacterDto characterDto);
 
     @Named("sortAdditionalMessagesByIdDesc")
     default List<CreateAdditionalMessageOutputDto> sortAdditionalMessagesByIdDesc(List<AdditionalMessageJPA> additionalMessages) {

@@ -9,25 +9,28 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "messages")
+@Table(name = "characters")
 @Getter
 @Setter
 @NoArgsConstructor
-public class MessageJpa {
-
+public class CharacterJPA {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String message;
+    @Column
+    private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "message_id")
-    private List<AdditionalMessageJPA> additionalMessages;
+    @Column
+    private String gender;
+
+    @Column
+    private LocalDate birthDate;
 
     @Column(nullable = false)
     private LocalDate date = LocalDate.now();
 
-    private Boolean isActive = true;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "attributes_id", referencedColumnName = "id")
+    private AttributesJPA attributes = new AttributesJPA();
 }
