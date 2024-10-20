@@ -37,9 +37,9 @@ public class JobService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 5 ? * TUE")
+    @Scheduled(cron = "0 30 16 * * ?")
     public void sendAttributesEmail() {
         emailSenderService.sendAttributesEmail();
-        log.info("Sending backup email - every tuesdays at 5am.");
+        log.info("Sending attributes email - every day at 16:00.");
     }
 }
