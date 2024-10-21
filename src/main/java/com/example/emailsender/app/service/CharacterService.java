@@ -78,7 +78,7 @@ public class CharacterService {
             }
 
             if (updateAttributesDto.getMinutesMeditating() != null) {
-                attributesJPA.setLastMeditation(updateAttributesDto.getLastMeditation());
+                attributesJPA.setMinutesMeditating(updateAttributesDto.getMinutesMeditating());
             }
 
             if (updateAttributesDto.getKmsRun() != null) {
