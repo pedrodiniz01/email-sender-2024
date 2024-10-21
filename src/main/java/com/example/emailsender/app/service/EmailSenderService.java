@@ -107,7 +107,7 @@ public class EmailSenderService {
 
     private String buildAttributesMessage(CharacterJPA character) {
         AttributesJPA attributes = character.getAttributes();
-        int age = calculateAge(character.getBirthDate(), LocalDate.now());
+        double age = calculateAge(character.getBirthDate(), LocalDate.now());
 
         float sparringHours = attributes.getSparringMinutes() / 60f;
         float sparringDays = attributes.getSparringMinutes() / (60f * 24f);
@@ -123,7 +123,7 @@ public class EmailSenderService {
         float runningDays = attributes.getMinutesRun() / (60f * 24f);
 
         String message = String.format(
-                "Hello %s, you are %d years old.\n\n" +
+                "Hello %s, you are %.2f years old.\n\n" +
                         "Sparring Minutes: %.1f (%.2f hours, %.2f days)\n\n" +
                         "Pages Read: %d\n\n" +
                         "Averages Minutes Reading: %.1f (%.2f hours, %.2f days)\n\n" +
@@ -146,9 +146,14 @@ public class EmailSenderService {
     }
 
 
-    private int calculateAge(LocalDate birthdate, LocalDate currentDate) {
+    private double calculateAge(LocalDate birthdate, LocalDate currentDate) {
         if (birthdate != null) {
-            return Period.between(birthdate, currentDate).getYears();
+            Period period = Period.between(birthdate, currentDate);
+            int years = period.getYears();
+            int months = period.getMonths();
+
+            double fractionalYears = months / 12.0;
+            return years + fractionalYears;
         } else {
             return 0;
         }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -101,4 +102,59 @@ public class CharacterService {
 
         return list.get(0);
     }
+
+    public String buildAttributesMessage() {
+
+        CharacterJPA character = getMainCharacter();
+        AttributesJPA attributes = character.getAttributes();
+        double age = calculateAge(character.getBirthDate(), LocalDate.now());
+
+        float sparringHours = attributes.getSparringMinutes() / 60f;
+        float sparringDays = attributes.getSparringMinutes() / (60f * 24f);
+
+        float minutesReading = attributes.getPagesRead() > 0 ? attributes.getPagesRead() * 120 : 0;
+        float readingHours = minutesReading / 60f;
+        float readingDays = minutesReading / (60f * 24f);
+
+        float meditationHours = attributes.getMinutesMeditating() / 60f;
+        float meditationDays = attributes.getMinutesMeditating() / (60f * 24f);
+
+        float runningHours = attributes.getMinutesRun() / 60f;
+        float runningDays = attributes.getMinutesRun() / (60f * 24f);
+
+        String message = String.format(
+                "Hello %s, you are %.2f years old.\n\n" +
+                        "Sparring Minutes: %.1f (%.2f hours, %.2f days)\n\n" +
+                        "Pages Read: %d\n\n" +
+                        "Averages Minutes Reading: %.1f (%.2f hours, %.2f days)\n\n" +
+                        "Meditation Streak: %d days\n\n" +
+                        "Minutes Meditating: %d (%.2f hours, %.2f days)\n\n" +
+                        "KMs Run: %.2f\n\n" +
+                        "Minutes Running: %d (%.2f hours, %.2f days)",
+                character.getName(),
+                age,
+                attributes.getSparringMinutes(), sparringHours, sparringDays,
+                attributes.getPagesRead(),
+                minutesReading, readingHours, readingDays,
+                attributes.getMeditationStreak(),
+                attributes.getMinutesMeditating(), meditationHours, meditationDays,
+                attributes.getKmsRun(),
+                attributes.getMinutesRun(), runningHours, runningDays
+        );
+
+        return message;
+    }
+    private double calculateAge(LocalDate birthdate, LocalDate currentDate) {
+        if (birthdate != null) {
+            Period period = Period.between(birthdate, currentDate);
+            int years = period.getYears();
+            int months = period.getMonths();
+
+            double fractionalYears = months / 12.0;
+            return years + fractionalYears;
+        } else {
+            return 0;
+        }
+    }
+
 }

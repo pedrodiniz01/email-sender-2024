@@ -44,4 +44,9 @@ public class CharacterController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/progression")
+    public ResponseEntity<String> getCharacterProgression() {
+        return new ResponseEntity<>(characterService.buildAttributesMessage(), HttpStatus.OK);
+    }
 }
