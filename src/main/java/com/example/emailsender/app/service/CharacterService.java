@@ -54,21 +54,21 @@ public class CharacterService {
             AttributesJPA attributesJPA = characterJPA.getAttributes();
 
             if (updateAttributesDto.getSparringMinutes() != null) {
-                attributesJPA.setSparringMinutes(updateAttributesDto.getSparringMinutes());
+                attributesJPA.setSparringMinutes(attributesJPA.getSparringMinutes() + updateAttributesDto.getSparringMinutes());
             }
 
             if (updateAttributesDto.getPagesRead() != null) {
-                attributesJPA.setPagesRead(updateAttributesDto.getPagesRead());
+                attributesJPA.setPagesRead(attributesJPA.getPagesRead() + updateAttributesDto.getPagesRead());
             }
 
             if (updateAttributesDto.getLastMeditation() != null) {
-                LocalDate lastLastMeditation = updateAttributesDto.getLastMeditation();
+                LocalDate lastLastMeditation = attributesJPA.getLastMeditation();
 
-                attributesJPA.setLastMeditation(LocalDate.now());
+                attributesJPA.setLastMeditation(updateAttributesDto.getLastMeditation());
 
                 LocalDate lastMeditation = updateAttributesDto.getLastMeditation();
 
-                if (ChronoUnit.DAYS.between(lastLastMeditation, lastMeditation) < 1) {
+                if (ChronoUnit.DAYS.between(lastLastMeditation, lastMeditation) <= 1) {
                     attributesJPA.setMeditationStreak(updateAttributesDto.getMeditationStreak() + 1);
                 }
             }
@@ -78,15 +78,15 @@ public class CharacterService {
             }
 
             if (updateAttributesDto.getMinutesMeditating() != null) {
-                attributesJPA.setMinutesMeditating(updateAttributesDto.getMinutesMeditating());
+                attributesJPA.setMinutesMeditating(attributesJPA.getMinutesMeditating() + updateAttributesDto.getMinutesMeditating());
             }
 
             if (updateAttributesDto.getKmsRun() != null) {
-                attributesJPA.setKmsRun(updateAttributesDto.getKmsRun());
+                attributesJPA.setKmsRun(attributesJPA.getKmsRun() + updateAttributesDto.getKmsRun());
             }
 
             if (updateAttributesDto.getMinutesRun() != null) {
-                attributesJPA.setMinutesRun(updateAttributesDto.getMinutesRun());
+                attributesJPA.setMinutesRun(attributesJPA.getMinutesRun() + updateAttributesDto.getMinutesRun());
             }
 
             characterJpaRepository.save(characterJPA);
